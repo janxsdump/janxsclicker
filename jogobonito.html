@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janx's Clicker</title>
+    <!-- Importando Tailwind via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Adicionando um pouco de estilo customizado (se necessário) */
+        body {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex justify-center items-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-6">Janx's Clicker</h1>
+
+        <!-- Exibe o nível e a vida do inimigo -->
+        <div class="mb-4">
+            <p id="nivel" class="text-xl text-gray-800">Seu nível: 1</p>
+            <p id="vida_inimigo" class="text-lg text-gray-600">Vida do inimigo: 10</p>
+        </div>
+
+        <!-- Botão de ataque -->
+        <button id="atacar-btn" class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300">Atacar!</button>
+
+        <!-- Exibe o resultado -->
+        <p id="resultado" class="mt-4 text-xl text-gray-800 font-semibold"></p>
+    </div>
+
+    <script>
+        // Inicializa o nível e a vida do inimigo
+        let lvl = 1;
+        let inimigo_vida = calcularVidaInimigo(lvl);  // A vida começa calculada
+
+        // Função para calcular a vida do inimigo com escalamento exponencial suave
+        function calcularVidaInimigo(nivel) {
+            const base = 10;  // Valor base da vida do inimigo
+            const fator_exponencial = 0.6;  // Fator que controla a suavidade do crescimento
+            return base * (1 + Math.pow(nivel, 1.5) * fator_exponencial);  // Escala exponencial suave
+        }
+
+        // Atualiza as informações na tela
+        function atualizarTela() {
+            document.getElementById('nivel').innerText = `Seu nível: ${lvl}`;
+            document.getElementById('vida_inimigo').innerText = `Vida do inimigo: ${Math.max(inimigo_vida, 0).toFixed(0)}`;
+        }
+
+        // Função para o ataque do jogador
+        function atacar() {
+            if (inimigo_vida <= 0) {
+                return;  // Não faz nada se o inimigo já foi derrotado
+            }
+
+            // Calcula o dano com 10% de chance de ser crítico
+            let dano = lvl * 3;  // Dano normal
+            let resultado_texto = `💥 Você causou ${dano} de dano!`;
+
+            if (Math.random() <= 0.1) {  // Chance de 10% para dano crítico
+                dano = lvl * 10;
+                resultado_texto = `🎯 Crítico! Você causou ${dano} de dano!`;
+            }
+
+            // Aplica o dano ao inimigo
+            inimigo_vida -= dano;
+
+            // Atualiza o resultado na tela
+            document.getElementById('resultado').innerText = resultado_texto;
+
+            // Atualiza a vida do inimigo
+            if (inimigo_vida <= 0) {
+                document.getElementById('resultado').innerText = "Você derrotou o inimigo!";
+                // Após a vitória, o jogador sobe de nível
+                lvl += 1;
+                inimigo_vida = calcularVidaInimigo(lvl);  // Calcula a nova vida do inimigo com base no novo nível
+                document.getElementById('resultado').innerText += ` Você subiu para o nível ${lvl}!`;
+            }
+
+            // Atualiza as informações da tela
+            atualizarTela();
+        }
+
+        // Adiciona o evento de clique no botão de atacar
+        document.getElementById('atacar-btn').addEventListener('click', atacar);
+
+        // Atualiza a tela ao carregar a página
+        atualizarTela();
+    </script>
+
+</body>
+</html>
